@@ -118,7 +118,7 @@ const Productos = ({ restauranteId, isAdmin }) => {
     });
 
     return (
-        <div style={{ padding: '32px' }}>
+        <div style={{ padding: window.innerWidth >= 640 ? '32px' : '16px' }}>
             {/* Header */}
             <div style={{
                 display: 'flex',
@@ -126,12 +126,14 @@ const Productos = ({ restauranteId, isAdmin }) => {
                 alignItems: 'center',
                 marginBottom: '32px',
                 flexWrap: 'wrap',
-                gap: '16px'
+                gap: '16px',
+                flexDirection: window.innerWidth >= 768 ? 'row' : 'column',
+                alignItems: window.innerWidth >= 768 ? 'center' : 'stretch'
             }}>
                 <div>
                     <h1 style={{
                         margin: '0 0 8px 0',
-                        fontSize: '32px',
+                        fontSize: window.innerWidth >= 640 ? '32px' : '24px',
                         fontWeight: '700',
                         color: '#1a202c'
                     }}>
@@ -146,7 +148,11 @@ const Productos = ({ restauranteId, isAdmin }) => {
                     </p>
                 </div>
 
-                <div style={{ display: 'flex', gap: '12px' }}>
+                <div style = {{ 
+                    display: 'flex',
+                     gap: '12px', 
+                     width: window.innerWidth >= 768 ? 'auto' : '100%',}}>      
+
                     <button
                         onClick={() => setMostrarModalCategoria(true)}
                         style={{
@@ -195,7 +201,8 @@ const Productos = ({ restauranteId, isAdmin }) => {
                                 alignItems: 'center',
                                 gap: '8px',
                                 boxShadow: '0 4px 12px rgba(255,107,53,0.3)',
-                                transition: 'all 0.2s'
+                                transition: 'all 0.2s',
+                                flex: window.innerWidth >= 768 ? '0' : '1'
                             }}
                             onMouseOver={(e) => {
                                 e.currentTarget.style.transform = 'translateY(-2px)';
@@ -218,7 +225,7 @@ const Productos = ({ restauranteId, isAdmin }) => {
                 display: 'flex',
                 gap: '16px',
                 marginBottom: '24px',
-                flexWrap: 'wrap'
+                flexDirection: window.innerWidth >= 768 ? 'row' : 'column',
             }}>
                 <div style={{ flex: 1, minWidth: '300px', position: 'relative' }}>
                     <Search
@@ -266,7 +273,8 @@ const Productos = ({ restauranteId, isAdmin }) => {
                         fontSize: '14px',
                         outline: 'none',
                         cursor: 'pointer',
-                        minWidth: '200px'
+                        minWidth: window.innerWidth >= 768 ? '200px' : '100%',
+                        width: window.innerWidth >= 768 ? 'auto' : '100%'
                     }}
                 >
                     <option value="all">Todas las categorías</option>
@@ -299,7 +307,7 @@ const Productos = ({ restauranteId, isAdmin }) => {
             ) : (
                 <div style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                    gridTemplateColumns: window.innerWidth >= 640 ? 'repeat(auto-fill, minmax(280px, 1fr))' : '1fr',
                     gap: '24px'
                 }}>
                     {productosFiltrados.map(producto => (
@@ -658,7 +666,9 @@ const ProductoCard = ({ producto, isAdmin, onEditar, onEliminar, onToggleDisponi
                         }}>
                             Esta acción no se puede deshacer. El producto "{producto.nombre}" será eliminado permanentemente.
                         </p>
-                        <div style={{ display: 'flex', gap: '12px' }}>
+                        <div style={{ display: 'flex',
+                             gap: '12px',
+                             width: window.innerWidth >= 768 ? 'auto' : '100%' }}>
                             <button
                                 onClick={() => setShowConfirm(false)}
                                 style={{
@@ -723,7 +733,7 @@ const ModalProducto = ({ producto, categorias, restauranteId, onClose, onSuccess
         //Previww optimista - mostrar imagen inmediatamente
         const previewUrl = URL.createObjectURL(file);
         setFormData({ ...formData, imagen_url: previewUrl });
-        
+
 
         // Validar tipo y tamaño
         if (!file.type.startsWith('image/')) {
@@ -850,6 +860,9 @@ const ModalProducto = ({ producto, categorias, restauranteId, onClose, onSuccess
                 borderRadius: '20px',
                 width: '100%',
                 maxWidth: '700px',
+                margin: window.innerWidth >= 640 ? 'auto' : '0',
+                width: window.innerWidth >= 640 ? '100%' : '100vw',
+                borderRadius: window.innerWidth >= 640 ? '20px' : '0',
                 maxHeight: '90vh',
                 overflow: 'auto',
                 position: 'relative'
@@ -908,7 +921,7 @@ const ModalProducto = ({ producto, categorias, restauranteId, onClose, onSuccess
                 </div>
 
                 {/* Form */}
-                <form onSubmit={handleSubmit} style={{ padding: '24px' }}>
+                <form onSubmit={handleSubmit} style={{ padding: window.innerWidth >= 640 ? '24px' : '16px' }}>
                     {/* Imagen del Producto */}
                     <div style={{ marginBottom: '24px' }}>
                         <label style={{
@@ -1058,7 +1071,7 @@ const ModalProducto = ({ producto, categorias, restauranteId, onClose, onSuccess
                     {/* Categoría y SKU */}
                     <div style={{
                         display: 'grid',
-                        gridTemplateColumns: '1fr 1fr',
+                        gridTemplateColumns: window.innerWidth >= 640 ? '1fr 1fr' : '1fr',
                         gap: '16px',
                         marginBottom: '20px'
                     }}>
@@ -1125,7 +1138,7 @@ const ModalProducto = ({ producto, categorias, restauranteId, onClose, onSuccess
                     {/* Precio de Venta y Costo */}
                     <div style={{
                         display: 'grid',
-                        gridTemplateColumns: '1fr 1fr',
+                        gridTemplateColumns: window.innerWidth >= 640 ? '1fr 1fr' : '1fr',
                         gap: '16px',
                         marginBottom: '20px'
                     }}>
@@ -1300,7 +1313,7 @@ const ModalProducto = ({ producto, categorias, restauranteId, onClose, onSuccess
                         {/* Lista de Agregados */}
                         <div style={{
                             display: 'grid',
-                            gridTemplateColumns: '2fr 1fr auto',
+                            gridTemplateColumns: window.innerWidth >= 640 ? '2fr 1fr auto' : '1fr',
                             gap: '12px',
                             marginBottom: '16px'
                         }}>
@@ -1636,6 +1649,8 @@ const ModalCategorias = ({ restauranteId, categorias, onClose, onSuccess }) => {
           borderRadius: '20px',
           width: '100%',
           maxWidth: '500px',
+          width: window.innerWidth >= 640 ? '100%' : '100vw',
+          borderRadius: window.innerWidth >= 640 ? '20px' : '0',
           maxHeight: '90vh',
           overflow: 'hidden',
           display: 'flex',
@@ -2027,7 +2042,9 @@ const ModalCategorias = ({ restauranteId, categorias, onClose, onSuccess }) => {
             }}>
               Se eliminará la categoría <strong>"{categoriaAEliminar.nombre}"</strong>. Los productos asociados quedarán sin categoría.
             </p>
-            <div style={{ display: 'flex', gap: '12px' }}>
+            <div style={{ display: 'flex',
+                 gap: '12px',
+                 width: window.innerWidth >= 768 ? 'auto' : '100%' }}>
               <button
                 onClick={() => setCategoriaAEliminar(null)}
                 style={{

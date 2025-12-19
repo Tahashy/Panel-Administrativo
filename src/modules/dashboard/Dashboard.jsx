@@ -121,12 +121,12 @@ const Dashboard = ({ restauranteId }) => {
   );
 
   return (
-    <div style={{ padding: '32px' }}>
+    <div style={{ padding: window.innerWidth >= 640 ? '32px' : '16px' }}>
       {/* Header */}
       <div style={{ marginBottom: '32px' }}>
         <h1 style={{
           margin: '0 0 8px 0',
-          fontSize: '32px',
+          fontSize: window.innerWidth >= 640 ? '32px' : '24px',
           fontWeight: '700',
           color: '#1a202c'
         }}>
@@ -144,7 +144,7 @@ const Dashboard = ({ restauranteId }) => {
       {/* Stats Grid */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+        gridTemplateColumns: window.innerWidth >= 768 ? 'repeat(auto-fit, minmax(250px, 1fr))' : '1fr',
         gap: '24px',
         marginBottom: '32px'
       }}>
@@ -181,7 +181,7 @@ const Dashboard = ({ restauranteId }) => {
       {/* Ventas de la Semana + Top Productos */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: '2fr 1fr',
+        gridTemplateColumns: window.innerWidth >= 1024 ? '2fr 1fr' : '1fr',
         gap: '24px'
       }}>
         <VentasSemana />
@@ -287,7 +287,7 @@ const VentasSemana = () => {
       </div>
 
       {/* Gráfico */}
-      <div style={{ height: '280px', marginBottom: '24px' }}>
+      <div style={{ height: window.innerWidth >= 640 ? '280px' : '200px', marginBottom: '24px' }}>
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={dataSemana}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
@@ -323,7 +323,7 @@ const VentasSemana = () => {
       {/* Stats Summary */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(3, 1fr)',
+        gridTemplateColumns: window.innerWidth >= 640 ? 'repeat(3, 1fr)' : '1fr',
         gap: '16px'
       }}>
         <div style={{
