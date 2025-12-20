@@ -1,7 +1,7 @@
 // src/modules/pedidos/components/PedidoRow.jsx
 
 import React from 'react';
-import { Eye, Edit, CheckCircle, XCircle, Trash2, Utensils, Package, Truck, ShoppingBag } from 'lucide-react';
+import { Edit, CheckCircle, XCircle, Trash2, Utensils, Package, Truck, ShoppingBag } from 'lucide-react';
 import ContadorTiempo from './ContadorTiempo';
 import { getEstadoColor } from '../utils/pedidoHelpers';
 
@@ -22,7 +22,16 @@ const PedidoRow = ({ pedido, onCambiarEstado, onVerDetalle, onEliminar, onEditar
   };
 
   return (
-    <tr style={{ borderBottom: '1px solid #f7fafc' }}>
+    <tr
+      onClick={() => onVerDetalle(pedido)}
+      style={{
+        borderBottom: '1px solid #f7fafc',
+        cursor: 'pointer',
+        transition: 'background 0.2s'
+      }}
+      onMouseOver={(e) => e.currentTarget.style.background = '#f7fafc'}
+      onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
+    >
       <td style={tdStyle}>
         <span style={{ fontWeight: '700', color: '#1a202c' }}>
           #{pedido.numero_pedido}
@@ -79,7 +88,7 @@ const PedidoRow = ({ pedido, onCambiarEstado, onVerDetalle, onEliminar, onEditar
         </span>
       </td>
       <td style={tdStyle}>
-        <ContadorTiempo 
+        <ContadorTiempo
           fechaCreacion={pedido.created_at}
           tiempoFinal={pedido.tiempo_preparacion}
           estado={pedido.estado}
@@ -87,25 +96,7 @@ const PedidoRow = ({ pedido, onCambiarEstado, onVerDetalle, onEliminar, onEditar
         />
       </td>
       <td style={tdStyle}>
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <button
-            onClick={() => onVerDetalle(pedido)}
-            style={{
-              padding: '8px',
-              background: '#3B82F6',
-              border: 'none',
-              borderRadius: '6px',
-              color: 'white',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-            title="Ver detalle"
-          >
-            <Eye size={16} />
-          </button>
-
+        <div style={{ display: 'flex', gap: '8px' }} onClick={(e) => e.stopPropagation()}>
           {pedido.estado !== 'entregado' && pedido.estado !== 'anulado' && (
             <>
               {/* Botón Editar */}
@@ -133,7 +124,7 @@ const PedidoRow = ({ pedido, onCambiarEstado, onVerDetalle, onEliminar, onEditar
                   onClick={() => {
                     const siguienteEstado =
                       pedido.estado === 'pendiente' ? 'preparando' :
-                      pedido.estado === 'preparando' ? 'listo' : 'entregado';
+                        pedido.estado === 'preparando' ? 'listo' : 'entregado';
                     onCambiarEstado(pedido.id, siguienteEstado);
                   }}
                   style={{

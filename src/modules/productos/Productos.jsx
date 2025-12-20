@@ -123,7 +123,6 @@ const Productos = ({ restauranteId, isAdmin }) => {
             <div style={{
                 display: 'flex',
                 justifyContent: 'space-between',
-                alignItems: 'center',
                 marginBottom: '32px',
                 flexWrap: 'wrap',
                 gap: '16px',
@@ -148,10 +147,11 @@ const Productos = ({ restauranteId, isAdmin }) => {
                     </p>
                 </div>
 
-                <div style = {{ 
+                <div style={{
                     display: 'flex',
-                     gap: '12px', 
-                     width: window.innerWidth >= 768 ? 'auto' : '100%',}}>      
+                    gap: '12px',
+                    width: window.innerWidth >= 768 ? 'auto' : '100%',
+                }}>
 
                     <button
                         onClick={() => setMostrarModalCategoria(true)}
@@ -666,9 +666,11 @@ const ProductoCard = ({ producto, isAdmin, onEditar, onEliminar, onToggleDisponi
                         }}>
                             Esta acción no se puede deshacer. El producto "{producto.nombre}" será eliminado permanentemente.
                         </p>
-                        <div style={{ display: 'flex',
-                             gap: '12px',
-                             width: window.innerWidth >= 768 ? 'auto' : '100%' }}>
+                        <div style={{
+                            display: 'flex',
+                            gap: '12px',
+                            width: window.innerWidth >= 768 ? 'auto' : '100%'
+                        }}>
                             <button
                                 onClick={() => setShowConfirm(false)}
                                 style={{
@@ -725,6 +727,23 @@ const ModalProducto = ({ producto, categorias, restauranteId, onClose, onSuccess
     const [loading, setLoading] = useState(false);
     const [uploadingImage, setUploadingImage] = useState(false);
     const [nuevoAgregado, setNuevoAgregado] = useState({ nombre: '', precio: '' });
+
+    // Reiniciar formulario cuando cambia el producto (nuevo o editar)
+    useEffect(() => {
+        setFormData({
+            nombre: producto?.nombre || '',
+            descripcion: producto?.descripcion || '',
+            precio: producto?.precio || '',
+            costo: producto?.costo || '',
+            categoria_id: producto?.categoria_id || '',
+            sku: producto?.sku || '',
+            stock: producto?.stock || 0,
+            imagen_url: producto?.imagen_url || '',
+            disponible: producto?.disponible ?? true,
+            agregados: producto?.agregados || []
+        });
+        setNuevoAgregado({ nombre: '', precio: '' });
+    }, [producto]);
 
     const handleImageUpload = async (e) => {
         const file = e.target.files[0];
@@ -857,8 +876,6 @@ const ModalProducto = ({ producto, categorias, restauranteId, onClose, onSuccess
         }}>
             <div style={{
                 background: 'white',
-                borderRadius: '20px',
-                width: '100%',
                 maxWidth: '700px',
                 margin: window.innerWidth >= 640 ? 'auto' : '0',
                 width: window.innerWidth >= 640 ? '100%' : '100vw',
@@ -1558,550 +1575,550 @@ const ModalProducto = ({ producto, categorias, restauranteId, onClose, onSuccess
 
 // Modal de Categorías con edición y confirmaciones
 const ModalCategorias = ({ restauranteId, categorias, onClose, onSuccess }) => {
-  const [nuevaCategoria, setNuevaCategoria] = useState('');
-  const [editandoId, setEditandoId] = useState(null);
-  const [editandoNombre, setEditandoNombre] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [categoriaAEliminar, setCategoriaAEliminar] = useState(null);
+    const [nuevaCategoria, setNuevaCategoria] = useState('');
+    const [editandoId, setEditandoId] = useState(null);
+    const [editandoNombre, setEditandoNombre] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [categoriaAEliminar, setCategoriaAEliminar] = useState(null);
 
-  const agregarCategoria = async (e) => {
-    e.preventDefault();
-    if (!nuevaCategoria.trim()) return;
+    const agregarCategoria = async (e) => {
+        e.preventDefault();
+        if (!nuevaCategoria.trim()) return;
 
-    setLoading(true);
-    try {
-      const { error } = await supabase
-        .from('categorias')
-        .insert([{
-          nombre: nuevaCategoria.trim(),
-          restaurante_id: restauranteId
-        }]);
+        setLoading(true);
+        try {
+            const { error } = await supabase
+                .from('categorias')
+                .insert([{
+                    nombre: nuevaCategoria.trim(),
+                    restaurante_id: restauranteId
+                }]);
 
-      if (error) throw error;
-      
-      setNuevaCategoria('');
-      onSuccess();
-      showToast('Categoría agregada correctamente', 'success');
-    } catch (error) {
-      console.error('Error agregando categoría:', error);
-      showToast('Error al agregar categoría', 'error');
-    } finally {
-      setLoading(false);
-    }
-  };
+            if (error) throw error;
 
-  const actualizarCategoria = async (id) => {
-    if (!editandoNombre.trim()) return;
+            setNuevaCategoria('');
+            onSuccess();
+            showToast('Categoría agregada correctamente', 'success');
+        } catch (error) {
+            console.error('Error agregando categoría:', error);
+            showToast('Error al agregar categoría', 'error');
+        } finally {
+            setLoading(false);
+        }
+    };
 
-    try {
-      const { error } = await supabase
-        .from('categorias')
-        .update({ nombre: editandoNombre.trim() })
-        .eq('id', id);
+    const actualizarCategoria = async (id) => {
+        if (!editandoNombre.trim()) return;
 
-      if (error) throw error;
-      
-      setEditandoId(null);
-      setEditandoNombre('');
-      onSuccess();
-      showToast('Categoría actualizada correctamente', 'success');
-    } catch (error) {
-      console.error('Error actualizando categoría:', error);
-      showToast('Error al actualizar categoría', 'error');
-    }
-  };
+        try {
+            const { error } = await supabase
+                .from('categorias')
+                .update({ nombre: editandoNombre.trim() })
+                .eq('id', id);
 
-  const eliminarCategoria = async (id) => {
-    try {
-      const { error } = await supabase
-        .from('categorias')
-        .delete()
-        .eq('id', id);
+            if (error) throw error;
 
-      if (error) throw error;
-      
-      onSuccess();
-      setCategoriaAEliminar(null);
-      showToast('Categoría eliminada correctamente', 'success');
-    } catch (error) {
-      console.error('Error eliminando categoría:', error);
-      showToast('Error al eliminar categoría', 'error');
-    }
-  };
+            setEditandoId(null);
+            setEditandoNombre('');
+            onSuccess();
+            showToast('Categoría actualizada correctamente', 'success');
+        } catch (error) {
+            console.error('Error actualizando categoría:', error);
+            showToast('Error al actualizar categoría', 'error');
+        }
+    };
 
-  return (
-    <>
-      <div style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: 'rgba(0,0,0,0.5)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 1000,
-        padding: '20px'
-      }}>
-        <div style={{
-          background: 'white',
-          borderRadius: '20px',
-          width: '100%',
-          maxWidth: '500px',
-          width: window.innerWidth >= 640 ? '100%' : '100vw',
-          borderRadius: window.innerWidth >= 640 ? '20px' : '0',
-          maxHeight: '90vh',
-          overflow: 'hidden',
-          display: 'flex',
-          flexDirection: 'column'
-        }}>
-          {/* Header */}
-          <div style={{
-            padding: '24px',
-            borderBottom: '1px solid #e2e8f0'
-          }}>
+    const eliminarCategoria = async (id) => {
+        try {
+            const { error } = await supabase
+                .from('categorias')
+                .delete()
+                .eq('id', id);
+
+            if (error) throw error;
+
+            onSuccess();
+            setCategoriaAEliminar(null);
+            showToast('Categoría eliminada correctamente', 'success');
+        } catch (error) {
+            console.error('Error eliminando categoría:', error);
+            showToast('Error al eliminar categoría', 'error');
+        }
+    };
+
+    return (
+        <>
             <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center'
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: 'rgba(0,0,0,0.5)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 1000,
+                padding: '20px'
             }}>
-              <div>
-                <h2 style={{
-                  margin: '0 0 4px 0',
-                  fontSize: '24px',
-                  fontWeight: '700',
-                  color: '#1a202c'
+                <div style={{
+                    background: 'white',
+                    maxWidth: '500px',
+                    width: window.innerWidth >= 640 ? '100%' : '100vw',
+                    borderRadius: window.innerWidth >= 640 ? '20px' : '0',
+                    maxHeight: '90vh',
+                    overflow: 'hidden',
+                    display: 'flex',
+                    flexDirection: 'column'
                 }}>
-                  Gestionar Categorías
-                </h2>
-                <p style={{
-                  margin: 0,
-                  fontSize: '14px',
-                  color: '#718096'
-                }}>
-                  Organiza tus productos por categorías
-                </p>
-              </div>
-              <button
-                onClick={onClose}
-                style={{
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '8px',
-                  border: 'none',
-                  background: '#f7fafc',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  transition: 'all 0.2s'
-                }}
-                onMouseOver={(e) => e.currentTarget.style.background = '#e2e8f0'}
-                onMouseOut={(e) => e.currentTarget.style.background = '#f7fafc'}
-              >
-                <X size={20} />
-              </button>
-            </div>
-          </div>
-
-          {/* Form Nueva Categoría */}
-          <div style={{ padding: '24px', borderBottom: '1px solid #e2e8f0' }}>
-            <form onSubmit={agregarCategoria} style={{ display: 'flex', gap: '12px' }}>
-              <input
-                type="text"
-                placeholder="Nueva categoría..."
-                value={nuevaCategoria}
-                onChange={(e) => setNuevaCategoria(e.target.value)}
-                style={{
-                  flex: 1,
-                  padding: '12px 16px',
-                  border: '2px solid #e2e8f0',
-                  borderRadius: '10px',
-                  fontSize: '15px',
-                  outline: 'none',
-                  transition: 'all 0.2s'
-                }}
-                onFocus={(e) => {
-                  e.target.style.borderColor = '#FF6B35';
-                  e.target.style.boxShadow = '0 0 0 3px rgba(255,107,53,0.1)';
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = '#e2e8f0';
-                  e.target.style.boxShadow = 'none';
-                }}
-              />
-              <button
-                type="submit"
-                disabled={loading || !nuevaCategoria.trim()}
-                style={{
-                  padding: '12px 20px',
-                  background: loading || !nuevaCategoria.trim() 
-                    ? '#cbd5e0' 
-                    : 'linear-gradient(135deg, #FF6B35 0%, #F7931E 100%)',
-                  border: 'none',
-                  borderRadius: '10px',
-                  color: 'white',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  cursor: loading || !nuevaCategoria.trim() ? 'not-allowed' : 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  boxShadow: loading || !nuevaCategoria.trim() 
-                    ? 'none' 
-                    : '0 4px 12px rgba(255,107,53,0.3)',
-                  transition: 'all 0.2s'
-                }}
-              >
-                <Plus size={18} />
-                Agregar
-              </button>
-            </form>
-          </div>
-
-          {/* Lista de Categorías */}
-          <div style={{
-            flex: 1,
-            overflowY: 'auto',
-            padding: '24px'
-          }}>
-            {categorias.length === 0 ? (
-              <div style={{
-                textAlign: 'center',
-                padding: '40px 0',
-                color: '#a0aec0'
-              }}>
-                <Tag size={48} color="#cbd5e0" style={{ marginBottom: '12px' }} />
-                <p style={{ margin: 0, fontSize: '14px' }}>
-                  No hay categorías creadas
-                </p>
-              </div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {categorias.map((categoria) => (
-                  <div
-                    key={categoria.id}
-                    style={{
-                      padding: '16px',
-                      background: '#f7fafc',
-                      borderRadius: '12px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '12px',
-                      transition: 'all 0.2s'
-                    }}
-                    onMouseOver={(e) => e.currentTarget.style.background = '#edf2f7'}
-                    onMouseOut={(e) => e.currentTarget.style.background = '#f7fafc'}
-                  >
+                    {/* Header */}
                     <div style={{
-                      width: '40px',
-                      height: '40px',
-                      borderRadius: '10px',
-                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexShrink: 0
+                        padding: '24px',
+                        borderBottom: '1px solid #e2e8f0'
                     }}>
-                      <Tag size={20} color="white" />
+                        <div style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center'
+                        }}>
+                            <div>
+                                <h2 style={{
+                                    margin: '0 0 4px 0',
+                                    fontSize: '24px',
+                                    fontWeight: '700',
+                                    color: '#1a202c'
+                                }}>
+                                    Gestionar Categorías
+                                </h2>
+                                <p style={{
+                                    margin: 0,
+                                    fontSize: '14px',
+                                    color: '#718096'
+                                }}>
+                                    Organiza tus productos por categorías
+                                </p>
+                            </div>
+                            <button
+                                onClick={onClose}
+                                style={{
+                                    width: '36px',
+                                    height: '36px',
+                                    borderRadius: '8px',
+                                    border: 'none',
+                                    background: '#f7fafc',
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    transition: 'all 0.2s'
+                                }}
+                                onMouseOver={(e) => e.currentTarget.style.background = '#e2e8f0'}
+                                onMouseOut={(e) => e.currentTarget.style.background = '#f7fafc'}
+                            >
+                                <X size={20} />
+                            </button>
+                        </div>
                     </div>
 
-                    {editandoId === categoria.id ? (
-                      <input
-                        type="text"
-                        value={editandoNombre}
-                        onChange={(e) => setEditandoNombre(e.target.value)}
-                        onKeyPress={(e) => {
-                          if (e.key === 'Enter') {
-                            actualizarCategoria(categoria.id);
-                          }
-                        }}
-                        autoFocus
-                        style={{
-                          flex: 1,
-                          padding: '8px 12px',
-                          border: '2px solid #FF6B35',
-                          borderRadius: '8px',
-                          fontSize: '15px',
-                          outline: 'none',
-                          boxShadow: '0 0 0 3px rgba(255,107,53,0.1)'
-                        }}
-                      />
-                    ) : (
-                      <p style={{
+                    {/* Form Nueva Categoría */}
+                    <div style={{ padding: '24px', borderBottom: '1px solid #e2e8f0' }}>
+                        <form onSubmit={agregarCategoria} style={{ display: 'flex', gap: '12px' }}>
+                            <input
+                                type="text"
+                                placeholder="Nueva categoría..."
+                                value={nuevaCategoria}
+                                onChange={(e) => setNuevaCategoria(e.target.value)}
+                                style={{
+                                    flex: 1,
+                                    padding: '12px 16px',
+                                    border: '2px solid #e2e8f0',
+                                    borderRadius: '10px',
+                                    fontSize: '15px',
+                                    outline: 'none',
+                                    transition: 'all 0.2s'
+                                }}
+                                onFocus={(e) => {
+                                    e.target.style.borderColor = '#FF6B35';
+                                    e.target.style.boxShadow = '0 0 0 3px rgba(255,107,53,0.1)';
+                                }}
+                                onBlur={(e) => {
+                                    e.target.style.borderColor = '#e2e8f0';
+                                    e.target.style.boxShadow = 'none';
+                                }}
+                            />
+                            <button
+                                type="submit"
+                                disabled={loading || !nuevaCategoria.trim()}
+                                style={{
+                                    padding: '12px 20px',
+                                    background: loading || !nuevaCategoria.trim()
+                                        ? '#cbd5e0'
+                                        : 'linear-gradient(135deg, #FF6B35 0%, #F7931E 100%)',
+                                    border: 'none',
+                                    borderRadius: '10px',
+                                    color: 'white',
+                                    fontSize: '14px',
+                                    fontWeight: '600',
+                                    cursor: loading || !nuevaCategoria.trim() ? 'not-allowed' : 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '8px',
+                                    boxShadow: loading || !nuevaCategoria.trim()
+                                        ? 'none'
+                                        : '0 4px 12px rgba(255,107,53,0.3)',
+                                    transition: 'all 0.2s'
+                                }}
+                            >
+                                <Plus size={18} />
+                                Agregar
+                            </button>
+                        </form>
+                    </div>
+
+                    {/* Lista de Categorías */}
+                    <div style={{
                         flex: 1,
-                        margin: 0,
-                        fontSize: '15px',
-                        fontWeight: '600',
-                        color: '#1a202c'
-                      }}>
-                        {categoria.nombre}
-                      </p>
-                    )}
+                        overflowY: 'auto',
+                        padding: '24px'
+                    }}>
+                        {categorias.length === 0 ? (
+                            <div style={{
+                                textAlign: 'center',
+                                padding: '40px 0',
+                                color: '#a0aec0'
+                            }}>
+                                <Tag size={48} color="#cbd5e0" style={{ marginBottom: '12px' }} />
+                                <p style={{ margin: 0, fontSize: '14px' }}>
+                                    No hay categorías creadas
+                                </p>
+                            </div>
+                        ) : (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                {categorias.map((categoria) => (
+                                    <div
+                                        key={categoria.id}
+                                        style={{
+                                            padding: '16px',
+                                            background: '#f7fafc',
+                                            borderRadius: '12px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '12px',
+                                            transition: 'all 0.2s'
+                                        }}
+                                        onMouseOver={(e) => e.currentTarget.style.background = '#edf2f7'}
+                                        onMouseOut={(e) => e.currentTarget.style.background = '#f7fafc'}
+                                    >
+                                        <div style={{
+                                            width: '40px',
+                                            height: '40px',
+                                            borderRadius: '10px',
+                                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            flexShrink: 0
+                                        }}>
+                                            <Tag size={20} color="white" />
+                                        </div>
 
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                      {editandoId === categoria.id ? (
-                        <>
-                          <button
-                            onClick={() => actualizarCategoria(categoria.id)}
-                            style={{
-                              width: '36px',
-                              height: '36px',
-                              borderRadius: '8px',
-                              border: 'none',
-                              background: '#10B981',
-                              color: 'white',
-                              cursor: 'pointer',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              transition: 'all 0.2s'
-                            }}
-                            onMouseOver={(e) => e.currentTarget.style.background = '#059669'}
-                            onMouseOut={(e) => e.currentTarget.style.background = '#10B981'}
-                          >
-                            <Check size={18} />
-                          </button>
-                          <button
-                            onClick={() => {
-                              setEditandoId(null);
-                              setEditandoNombre('');
-                            }}
-                            style={{
-                              width: '36px',
-                              height: '36px',
-                              borderRadius: '8px',
-                              border: 'none',
-                              background: '#EF4444',
-                              color: 'white',
-                              cursor: 'pointer',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              transition: 'all 0.2s'
-                            }}
-                            onMouseOver={(e) => e.currentTarget.style.background = '#DC2626'}
-                            onMouseOut={(e) => e.currentTarget.style.background = '#EF4444'}
-                          >
-                            <X size={18} />
-                          </button>
-                        </>
-                      ) : (
-                        <>
-                          <button
-                            onClick={() => {
-                              setEditandoId(categoria.id);
-                              setEditandoNombre(categoria.nombre);
-                            }}
-                            style={{
-                              width: '36px',
-                              height: '36px',
-                              borderRadius: '8px',
-                              border: 'none',
-                              background: 'white',
-                              color: '#4a5568',
-                              cursor: 'pointer',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              transition: 'all 0.2s'
-                            }}
-                            onMouseOver={(e) => {
-                              e.currentTarget.style.background = '#3B82F6';
-                              e.currentTarget.style.color = 'white';
-                            }}
-                            onMouseOut={(e) => {
-                              e.currentTarget.style.background = 'white';
-                              e.currentTarget.style.color = '#4a5568';
-                            }}
-                          >
-                            <Edit size={16} />
-                          </button>
-                          <button
-                            onClick={() => setCategoriaAEliminar(categoria)}
-                            style={{
-                              width: '36px',
-                              height: '36px',
-                              borderRadius: '8px',
-                              border: 'none',
-                              background: 'white',
-                              color: '#4a5568',
-                              cursor: 'pointer',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              transition: 'all 0.2s'
-                            }}
-                            onMouseOver={(e) => {
-                              e.currentTarget.style.background = '#EF4444';
-                              e.currentTarget.style.color = 'white';
-                            }}
-                            onMouseOut={(e) => {
-                              e.currentTarget.style.background = 'white';
-                              e.currentTarget.style.color = '#4a5568';
-                            }}
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        </>
-                      )}
+                                        {editandoId === categoria.id ? (
+                                            <input
+                                                type="text"
+                                                value={editandoNombre}
+                                                onChange={(e) => setEditandoNombre(e.target.value)}
+                                                onKeyPress={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                        actualizarCategoria(categoria.id);
+                                                    }
+                                                }}
+                                                autoFocus
+                                                style={{
+                                                    flex: 1,
+                                                    padding: '8px 12px',
+                                                    border: '2px solid #FF6B35',
+                                                    borderRadius: '8px',
+                                                    fontSize: '15px',
+                                                    outline: 'none',
+                                                    boxShadow: '0 0 0 3px rgba(255,107,53,0.1)'
+                                                }}
+                                            />
+                                        ) : (
+                                            <p style={{
+                                                flex: 1,
+                                                margin: 0,
+                                                fontSize: '15px',
+                                                fontWeight: '600',
+                                                color: '#1a202c'
+                                            }}>
+                                                {categoria.nombre}
+                                            </p>
+                                        )}
+
+                                        <div style={{ display: 'flex', gap: '8px' }}>
+                                            {editandoId === categoria.id ? (
+                                                <>
+                                                    <button
+                                                        onClick={() => actualizarCategoria(categoria.id)}
+                                                        style={{
+                                                            width: '36px',
+                                                            height: '36px',
+                                                            borderRadius: '8px',
+                                                            border: 'none',
+                                                            background: '#10B981',
+                                                            color: 'white',
+                                                            cursor: 'pointer',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            transition: 'all 0.2s'
+                                                        }}
+                                                        onMouseOver={(e) => e.currentTarget.style.background = '#059669'}
+                                                        onMouseOut={(e) => e.currentTarget.style.background = '#10B981'}
+                                                    >
+                                                        <Check size={18} />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => {
+                                                            setEditandoId(null);
+                                                            setEditandoNombre('');
+                                                        }}
+                                                        style={{
+                                                            width: '36px',
+                                                            height: '36px',
+                                                            borderRadius: '8px',
+                                                            border: 'none',
+                                                            background: '#EF4444',
+                                                            color: 'white',
+                                                            cursor: 'pointer',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            transition: 'all 0.2s'
+                                                        }}
+                                                        onMouseOver={(e) => e.currentTarget.style.background = '#DC2626'}
+                                                        onMouseOut={(e) => e.currentTarget.style.background = '#EF4444'}
+                                                    >
+                                                        <X size={18} />
+                                                    </button>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <button
+                                                        onClick={() => {
+                                                            setEditandoId(categoria.id);
+                                                            setEditandoNombre(categoria.nombre);
+                                                        }}
+                                                        style={{
+                                                            width: '36px',
+                                                            height: '36px',
+                                                            borderRadius: '8px',
+                                                            border: 'none',
+                                                            background: 'white',
+                                                            color: '#4a5568',
+                                                            cursor: 'pointer',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            transition: 'all 0.2s'
+                                                        }}
+                                                        onMouseOver={(e) => {
+                                                            e.currentTarget.style.background = '#3B82F6';
+                                                            e.currentTarget.style.color = 'white';
+                                                        }}
+                                                        onMouseOut={(e) => {
+                                                            e.currentTarget.style.background = 'white';
+                                                            e.currentTarget.style.color = '#4a5568';
+                                                        }}
+                                                    >
+                                                        <Edit size={16} />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => setCategoriaAEliminar(categoria)}
+                                                        style={{
+                                                            width: '36px',
+                                                            height: '36px',
+                                                            borderRadius: '8px',
+                                                            border: 'none',
+                                                            background: 'white',
+                                                            color: '#4a5568',
+                                                            cursor: 'pointer',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            transition: 'all 0.2s'
+                                                        }}
+                                                        onMouseOver={(e) => {
+                                                            e.currentTarget.style.background = '#EF4444';
+                                                            e.currentTarget.style.color = 'white';
+                                                        }}
+                                                        onMouseOut={(e) => {
+                                                            e.currentTarget.style.background = 'white';
+                                                            e.currentTarget.style.color = '#4a5568';
+                                                        }}
+                                                    >
+                                                        <Trash2 size={16} />
+                                                    </button>
+                                                </>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
-                  </div>
-                ))}
-              </div>
+
+                    {/* Footer */}
+                    <div style={{
+                        padding: '20px 24px',
+                        borderTop: '1px solid #e2e8f0',
+                        background: '#f7fafc'
+                    }}>
+                        <button
+                            onClick={onClose}
+                            style={{
+                                width: '100%',
+                                padding: '12px',
+                                background: 'white',
+                                border: '2px solid #e2e8f0',
+                                borderRadius: '10px',
+                                fontSize: '15px',
+                                fontWeight: '600',
+                                color: '#4a5568',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s'
+                            }}
+                            onMouseOver={(e) => {
+                                e.currentTarget.style.background = '#edf2f7';
+                                e.currentTarget.style.borderColor = '#cbd5e0';
+                            }}
+                            onMouseOut={(e) => {
+                                e.currentTarget.style.background = 'white';
+                                e.currentTarget.style.borderColor = '#e2e8f0';
+                            }}
+                        >
+                            Cerrar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {/* Modal de Confirmación de Eliminación */}
+            {categoriaAEliminar && (
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: 'rgba(0,0,0,0.7)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 10001,
+                    padding: '20px'
+                }}>
+                    <div style={{
+                        background: 'white',
+                        padding: '28px',
+                        borderRadius: '16px',
+                        maxWidth: '420px',
+                        width: '100%',
+                        boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
+                    }}>
+                        <div style={{
+                            width: '56px',
+                            height: '56px',
+                            borderRadius: '50%',
+                            background: '#FEE2E2',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            margin: '0 auto 20px'
+                        }}>
+                            <Trash2 size={28} color="#EF4444" />
+                        </div>
+
+                        <h3 style={{
+                            margin: '0 0 12px 0',
+                            fontSize: '22px',
+                            fontWeight: '700',
+                            color: '#1a202c',
+                            textAlign: 'center'
+                        }}>
+                            ¿Eliminar categoría?
+                        </h3>
+                        <p style={{
+                            margin: '0 0 24px 0',
+                            fontSize: '15px',
+                            color: '#718096',
+                            textAlign: 'center',
+                            lineHeight: '1.6'
+                        }}>
+                            Se eliminará la categoría <strong>"{categoriaAEliminar.nombre}"</strong>. Los productos asociados quedarán sin categoría.
+                        </p>
+                        <div style={{
+                            display: 'flex',
+                            gap: '12px',
+                            width: window.innerWidth >= 768 ? 'auto' : '100%'
+                        }}>
+                            <button
+                                onClick={() => setCategoriaAEliminar(null)}
+                                style={{
+                                    flex: 1,
+                                    padding: '12px',
+                                    background: 'white',
+                                    border: '2px solid #e2e8f0',
+                                    borderRadius: '10px',
+                                    fontSize: '15px',
+                                    fontWeight: '600',
+                                    color: '#4a5568',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s'
+                                }}
+                                onMouseOver={(e) => {
+                                    e.currentTarget.style.background = '#f7fafc';
+                                }}
+                                onMouseOut={(e) => {
+                                    e.currentTarget.style.background = 'white';
+                                }}
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                onClick={() => eliminarCategoria(categoriaAEliminar.id)}
+                                style={{
+                                    flex: 1,
+                                    padding: '12px',
+                                    background: '#EF4444',
+                                    border: 'none',
+                                    borderRadius: '10px',
+                                    color: 'white',
+                                    fontSize: '15px',
+                                    fontWeight: '600',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s',
+                                    boxShadow: '0 4px 12px rgba(239,68,68,0.3)'
+                                }}
+                                onMouseOver={(e) => {
+                                    e.currentTarget.style.background = '#DC2626';
+                                    e.currentTarget.style.transform = 'translateY(-2px)';
+                                    e.currentTarget.style.boxShadow = '0 6px 16px rgba(239,68,68,0.4)';
+                                }}
+                                onMouseOut={(e) => {
+                                    e.currentTarget.style.background = '#EF4444';
+                                    e.currentTarget.style.transform = 'translateY(0)';
+                                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(239,68,68,0.3)';
+                                }}
+                            >
+                                Sí, eliminar
+                            </button>
+                        </div>
+                    </div>
+                </div>
             )}
-          </div>
-
-          {/* Footer */}
-          <div style={{
-            padding: '20px 24px',
-            borderTop: '1px solid #e2e8f0',
-            background: '#f7fafc'
-          }}>
-            <button
-              onClick={onClose}
-              style={{
-                width: '100%',
-                padding: '12px',
-                background: 'white',
-                border: '2px solid #e2e8f0',
-                borderRadius: '10px',
-                fontSize: '15px',
-                fontWeight: '600',
-                color: '#4a5568',
-                cursor: 'pointer',
-                transition: 'all 0.2s'
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.background = '#edf2f7';
-                e.currentTarget.style.borderColor = '#cbd5e0';
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.background = 'white';
-                e.currentTarget.style.borderColor = '#e2e8f0';
-              }}
-            >
-              Cerrar
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Modal de Confirmación de Eliminación */}
-      {categoriaAEliminar && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'rgba(0,0,0,0.7)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 10001,
-          padding: '20px'
-        }}>
-          <div style={{
-            background: 'white',
-            padding: '28px',
-            borderRadius: '16px',
-            maxWidth: '420px',
-            width: '100%',
-            boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
-          }}>
-            <div style={{
-              width: '56px',
-              height: '56px',
-              borderRadius: '50%',
-              background: '#FEE2E2',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              margin: '0 auto 20px'
-            }}>
-              <Trash2 size={28} color="#EF4444" />
-            </div>
-
-            <h3 style={{
-              margin: '0 0 12px 0',
-              fontSize: '22px',
-              fontWeight: '700',
-              color: '#1a202c',
-              textAlign: 'center'
-            }}>
-              ¿Eliminar categoría?
-            </h3>
-            <p style={{
-              margin: '0 0 24px 0',
-              fontSize: '15px',
-              color: '#718096',
-              textAlign: 'center',
-              lineHeight: '1.6'
-            }}>
-              Se eliminará la categoría <strong>"{categoriaAEliminar.nombre}"</strong>. Los productos asociados quedarán sin categoría.
-            </p>
-            <div style={{ display: 'flex',
-                 gap: '12px',
-                 width: window.innerWidth >= 768 ? 'auto' : '100%' }}>
-              <button
-                onClick={() => setCategoriaAEliminar(null)}
-                style={{
-                  flex: 1,
-                  padding: '12px',
-                  background: 'white',
-                  border: '2px solid #e2e8f0',
-                  borderRadius: '10px',
-                  fontSize: '15px',
-                  fontWeight: '600',
-                  color: '#4a5568',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s'
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.background = '#f7fafc';
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.background = 'white';
-                }}
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={() => eliminarCategoria(categoriaAEliminar.id)}
-                style={{
-                  flex: 1,
-                  padding: '12px',
-                  background: '#EF4444',
-                  border: 'none',
-                  borderRadius: '10px',
-                  color: 'white',
-                  fontSize: '15px',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                  boxShadow: '0 4px 12px rgba(239,68,68,0.3)'
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.background = '#DC2626';
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 6px 16px rgba(239,68,68,0.4)';
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.background = '#EF4444';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(239,68,68,0.3)';
-                }}
-              >
-                Sí, eliminar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
-  );
+        </>
+    );
 };
 
 export default Productos;

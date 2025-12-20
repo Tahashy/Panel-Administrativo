@@ -10,7 +10,7 @@ import StatCard from './components/StatCard';
 import PedidoCard from './components/PedidoCard';
 import PedidoRow from './components/PedidoRow';
 import ModalNuevoPedido from './components/ModalNuevoPedido';
-import ModalDetallePedido from './components/ModalDetallePedido';
+import PanelLateralPedido from './components/PanelLateralPedido';
 import ModalEditarPedido from './components/ModalEditarPedido';
 
 // Hook personalizado
@@ -357,13 +357,17 @@ const Pedidos = ({ restauranteId, isAdmin, userId }) => {
                 )}
 
                 {mostrarDetalle && pedidoSeleccionado && (
-                    <ModalDetallePedido
+                    <PanelLateralPedido
                         pedido={pedidoSeleccionado}
                         onClose={() => {
                             setMostrarDetalle(false);
                             setPedidoSeleccionado(null);
                         }}
                         onCambiarEstado={cambiarEstadoPedido}
+                        onEditar={(pedido) => {
+                            setMostrarDetalle(false);
+                            editarPedido(pedido);
+                        }}
                     />
                 )}
                 {mostrarModalEditar && pedidoAEditar && (
